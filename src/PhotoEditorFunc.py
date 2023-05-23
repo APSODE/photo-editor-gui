@@ -17,4 +17,4 @@ class PhotoEditorFunc:
 
         canvas.create_image(0, 0, anchor = NW, image = cImage)
         canvas.pack()
-        self._master.mainloop()
+
