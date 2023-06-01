@@ -19,7 +19,7 @@ class PhotoEditorFunc:
         )
         ChangeImage = ImageTk.PhotoImage(OutPhoto)
 
-        # cImage가 ChangeImage로 변경되었지만 의존관계에 있는 코드들의 수정이 이루어지지 않았음
+
         canvas.create_image(0, 0, anchor=NW, image=ChangeImage)
         canvas.pack()
 
@@ -44,7 +44,6 @@ class PhotoEditorFunc:
         self._display_photo(OutY, OutX)
 
     def saveimagefile(self):
-        # PhotoEditorFunc.get_OutPhoto 메소드가 정의되지 않았는데 사용함.
         SavePhoto = OutPhoto
 
         if SavePhoto is None:
