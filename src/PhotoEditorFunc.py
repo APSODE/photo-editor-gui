@@ -1,15 +1,15 @@
 from typing import Optional
 from tkinter.filedialog import askopenfilename, asksaveasfile
-from tkinter.simpledialog import askinteger
+from tkinter.simpledialog import askinteger, askfloat
 from tkinter import Tk, Canvas, NW
 from PIL import Image, ImageTk, ImageEnhance, ImageFilter
 
 
 class PhotoEditorFunc:
-    OutPhoto = None
 
     def __init__(self, gui_master: Tk):
         self._master = gui_master
+        self._out_photo = None
 
     def _display_photo(self, height: int, width: int):
         canvas = Canvas(
@@ -17,13 +17,13 @@ class PhotoEditorFunc:
             width=width,
             height=height
         )
-        ChangeImage = ImageTk.PhotoImage(OutPhoto)
+        ChangeImage = ImageTk.PhotoImage(self._out_photo)
 
 
         canvas.create_image(0, 0, anchor=NW, image=ChangeImage)
         canvas.pack()
 
-    def _open_file(self):
+    def openfile(self):
         file_name = askopenfilename(
             parent=self._master,
             filetypes=(
@@ -38,18 +38,21 @@ class PhotoEditorFunc:
             )
         )
 
-        OutPhoto = Image.open(file_name)
-        OutX = OutPhoto.width
-        OutY = OutPhoto.height
-        self._display_photo(OutY, OutX)
+        self._out_photo = Image.open(file_name)
+        out_x = self._out_photo.width
+        out_y = self._out_photo.height
+        self._display_photo(out_y, out_x)
+
+    def funcexit(self):
+        exit()
 
     def saveimagefile(self):
-        SavePhoto = OutPhoto
+        save_photo = self._out_photo
 
-        if SavePhoto is None:
+        if save_photo is None:
             return
 
-        SaveFile = asksaveasfile(
+        save_file = asksaveasfile(
             parent=self._master,
             mode="w",
             defaultextension=".jpg",
@@ -64,10 +67,10 @@ class PhotoEditorFunc:
                 )
             )
         )
-        SavePhoto.save(SaveFile.name)
+        save_photo.save(save_file.name)
 
     def zoomin(self):
-        ZoomInScale = askinteger(
+        zoom_in_scale = askinteger(
             "확대배수",
             "확대할 배수를 입력하세요",
             minvalue=2,
@@ -75,27 +78,27 @@ class PhotoEditorFunc:
         )
 
 
-        OutPhoto = OutPhoto.resize((OutPhoto.height * ZoomInScale, OutPhoto.width * ZoomInScale))
-        self._display_photo(OutPhoto.height, OutPhoto.width)
+        self._out_photo = self._out_photo.resize((self._out_photo.height * zoom_in_scale, self._out_photo.width * zoom_in_scale))
+        self._display_photo(self._out_photo.height, self._out_photo.width)
 
     def zoomout(self):
-        ZoomOutScale = askinteger(
+        zoom_out_scale = askinteger(
             "확대배수",
             "확대할 배수를 입력하세요",
             minvalue=2,
             maxvalue=8
         )
 
-        OutPhoto = OutPhoto.resize((OutPhoto.height / ZoomOutScale, OutPhoto.width / ZoomOutScale))
-        self._display_photo(OutPhoto.height, OutPhoto.width)
+        self._out_photo = self._out_photo.resize((self._out_photo.height / zoom_out_scale, self._out_photo.width / zoom_out_scale))
+        self._display_photo(self._out_photo.height, self._out_photo.width)
 
     def upsidedown(self):
-        OutPhoto = OutPhoto.transpose(Image.FLIP_TOP_BOTTOM)
-        self._display_photo(OutPhoto.height, OutPhoto.width)
+        self._out_photo = self._out_photo.transpose(Image.FLIP_TOP_BOTTOM)
+        self._display_photo(self._out_photo.height, self._out_photo.width)
 
     def leftright(self):
-        OutPhoto = OutPhoto.transpose(Image.FLIP_LEFT_RIGHT)
-        self._display_photo(OutPhoto.height, OutPhoto.width)
+        self._out_photo = self._out_photo.transpose(Image.FLIP_LEFT_RIGHT)
+        self._display_photo(self._out_photo.height, self._out_photo.width)
 
     def rotate(self):
         angle = askinteger(
@@ -105,8 +108,8 @@ class PhotoEditorFunc:
             maxvalue=360
         )
 
-        OutPhoto = OutPhoto.rotate(angle, expand=True)
-        self._display_photo(OutPhoto.height, OutPhoto.width)
+        self._out_photo = self._out_photo.rotate(angle, expand=True)
+        self._display_photo(self._out_photo.height, self._out_photo.width)
 
     def bright(self):
         degree = askfloat(
@@ -116,22 +119,21 @@ class PhotoEditorFunc:
             maxvalue=5.0
         )
 
-        OutPhoto = ImageEnhance.Brightness(OutPhoto).enhance(degree)
-        self._display_photo(OutPhoto.height, OutPhoto.width)
+        self._out_photo = ImageEnhance.Brightness(self._out_photo).enhance(degree)
+        self._display_photo(self._out_photo.height, self._out_photo.width)
 
     def embos(self):
-        OutPhoto = OutPhoto.filter(ImageFilter.EMBOSS)
-        self._display_photo(OutPhoto.height, OutPhoto.width)
+        self._out_photo = self._out_photo.filter(ImageFilter.EMBOSS)
+        self._display_photo(self._out_photo.height, self._out_photo.width)
 
     def blur(self):
-        OutPhoto = OutPhoto.filter(ImageFilter.BLUR)
-        self._display_photo(OutPhoto.height, OutPhoto.width)
+        self._out_photo = self._out_photo.filter(ImageFilter.BLUR)
+        self._display_photo(self._out_photo.height, self._out_photo.width)
 
     def sketch(self):
-        OutPhoto = OutPhoto.filter(ImageFilter.CONTOUR)
-        self._display_photo(OutPhoto.height, OutPhoto.width)
+        self._out_photo = self._out_photo.filter(ImageFilter.CONTOUR)
+        self._display_photo(self._out_photo.height, self._out_photo.width)
 
     def edge(self):
-        OutPhoto = OutPhoto.filter(ImageFilter.FIND_EDGES)
-        self._display_photo(OutPhoto.height, OutPhoto.width)
-
+        self._out_photo = self._out_photo.filter(ImageFilter.FIND_EDGES)
+        self._display_photo(self._out_photo.height, self._out_photo.width)
