@@ -30,7 +30,7 @@ class PhotoEditorGUI:
     def _set_default_window_setting(self):
         self._master.title("포토 에디터")
         self._master.geometry("500x500")
-        self._master.resizable = (False, False)
+        self._master.resizable = (True, True)
 
     def _set_base_component(self):
         base_menu = tkinter.Menu(
@@ -112,18 +112,23 @@ class PhotoEditorGUI:
                 "sp1": None,
                 "상하 반전": self._photo_editor.upsidedown,
                 "좌우 반전": self._photo_editor.leftright,
-                "회전": self._photo_editor.rotate
+                "회전": self._photo_editor.rotate,
             }
         )
 
         self._create_menu(
-            menu_name = "테스트 1",
+            menu_name = "도형그리기",
             command_data = {
-                "테스트 1-1": test,
-                "테스트 1-2": {
-                    "테스트 1-2-1": test,
-                    "테스트 1-2-2": test,
-                    "테스트 1-2-3": test
+                "색": {
+                    "빨간색": test,
+                    "파란색": test,
+                    "노란색": test,
+                    "검은색": test
+                },
+                "도형": {
+                    "원": test,
+                    "직선": test,
+                    "네모": test
                 }
             }
         )

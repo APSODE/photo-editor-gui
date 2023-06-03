@@ -10,9 +10,13 @@ class PhotoEditorFunc:
     def __init__(self, gui_master: Tk):
         self._master = gui_master
         self._out_photo = None
+        self._canvas: Optional[Canvas] = None
 
     def _display_photo(self, height: int, width: int):
-        canvas = Canvas(
+        if self._canvas is not None:
+            self._canvas.destroy()
+
+        self._canvas = Canvas(
             master=self._master,
             width=width,
             height=height
@@ -20,9 +24,10 @@ class PhotoEditorFunc:
 
         ChangeImage = ImageTk.PhotoImage(self._out_photo)
 
-
-        canvas.create_image(0, 0, anchor=NW, image=ChangeImage)
-        canvas.pack()
+        self._canvas.create_image(0, 0, anchor=NW, image=ChangeImage)
+        self._canvas.pack()
+        self._master.geometry(f"{width}x{height}")
+        self._master.mainloop()
 
 
     def openfile(self):
@@ -157,3 +162,6 @@ class PhotoEditorFunc:
         if self._out_photo is not None:
             self._out_photo = self._out_photo.filter(ImageFilter.FIND_EDGES)
             self._display_photo(self._out_photo.height, self._out_photo.width)
+
+    def drawing(self):
+        pass
