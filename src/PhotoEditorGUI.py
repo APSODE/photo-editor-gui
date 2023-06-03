@@ -1,6 +1,6 @@
 from typing import Optional, Dict, Callable
 from tkinter import Tk
-from src.TestFunc import test
+from src.PhotoEditorFunc import PhotoEditorFunc
 import tkinter
 
 
@@ -20,6 +20,7 @@ class ComponentContainer:
 class PhotoEditorGUI:
     def __init__(self):
         self._master = Tk()
+        self._photo_editor = PhotoEditorFunc(self._master)
         self._component_container = ComponentContainer()
         self._set_default_window_setting()
         self._set_base_component()
@@ -65,35 +66,35 @@ class PhotoEditorGUI:
         self._create_menu(
             menu_name = "파일",
             command_data = {
-                "파일 열기": test,
-                "파일 저장": test,
+                "파일 열기": self._photo_editor.openfile,
+                "파일 저장": self._photo_editor.saveimagefile,
                 "sp1": None,
-                "프로그램 종료": test
+                "프로그램 종료": self._photo_editor.funcexit
             }
         )
 
         self._create_menu(
             menu_name = "이미지 처리 (1)",
             command_data = {
-                "밝게/어둡게": test,
+                "밝게/어둡게": self._photo_editor.bright,
                 "sp1": None,
-                "엠보싱": test,
-                "블러링": test,
+                "엠보싱": self._photo_editor.emboss,
+                "블러링": self._photo_editor.blur,
                 "sp2": None,
-                "연필스케치": test,
-                "경계선 추출": test
+                "연필스케치": self._photo_editor.sketch,
+                "경계선 추출": self._photo_editor.edge
             }
         )
 
         self._create_menu(
             menu_name = "이미지 처리 (2)",
             command_data = {
-                "확대": test,
-                "축소": test,
+                "확대": self._photo_editor.zoomin,
+                "축소": self._photo_editor.zoomout,
                 "sp1": None,
-                "상하 반전": test,
-                "좌우 반전": test,
-                "회전": test,
+                "상하 반전": self._photo_editor.upsidedown,
+                "좌우 반전": self._photo_editor.leftright,
+                "회전": self._photo_editor.rotate
             }
         )
 

@@ -17,11 +17,13 @@ class PhotoEditorFunc:
             width=width,
             height=height
         )
+
         ChangeImage = ImageTk.PhotoImage(self._out_photo)
 
 
         canvas.create_image(0, 0, anchor=NW, image=ChangeImage)
         canvas.pack()
+
 
     def openfile(self):
         file_name = askopenfilename(
@@ -37,6 +39,7 @@ class PhotoEditorFunc:
                 )
             )
         )
+
 
         self._out_photo = Image.open(file_name)
         out_x = self._out_photo.width
@@ -77,9 +80,10 @@ class PhotoEditorFunc:
             maxvalue=8
         )
 
+        if self._out_photo is not None:
+            self._out_photo = self._out_photo.resize((self._out_photo.height * zoom_in_scale, self._out_photo.width * zoom_in_scale))
+            self._display_photo(self._out_photo.height, self._out_photo.width)
 
-        self._out_photo = self._out_photo.resize((self._out_photo.height * zoom_in_scale, self._out_photo.width * zoom_in_scale))
-        self._display_photo(self._out_photo.height, self._out_photo.width)
 
     def zoomout(self):
         zoom_out_scale = askinteger(
@@ -89,16 +93,22 @@ class PhotoEditorFunc:
             maxvalue=8
         )
 
-        self._out_photo = self._out_photo.resize((self._out_photo.height / zoom_out_scale, self._out_photo.width / zoom_out_scale))
-        self._display_photo(self._out_photo.height, self._out_photo.width)
+        if self._out_photo is not None:
+            self._out_photo = self._out_photo.resize((self._out_photo.height / zoom_out_scale, self._out_photo.width / zoom_out_scale))
+            self._display_photo(self._out_photo.height, self._out_photo.width)
+
 
     def upsidedown(self):
-        self._out_photo = self._out_photo.transpose(Image.FLIP_TOP_BOTTOM)
-        self._display_photo(self._out_photo.height, self._out_photo.width)
+        if self._out_photo is not None:
+            self._out_photo = self._out_photo.transpose(Image.FLIP_TOP_BOTTOM)
+            self._display_photo(self._out_photo.height, self._out_photo.width)
+
 
     def leftright(self):
-        self._out_photo = self._out_photo.transpose(Image.FLIP_LEFT_RIGHT)
-        self._display_photo(self._out_photo.height, self._out_photo.width)
+        if self._out_photo is not None:
+            self._out_photo = self._out_photo.transpose(Image.FLIP_LEFT_RIGHT)
+            self._display_photo(self._out_photo.height, self._out_photo.width)
+
 
     def rotate(self):
         angle = askinteger(
@@ -108,8 +118,10 @@ class PhotoEditorFunc:
             maxvalue=360
         )
 
-        self._out_photo = self._out_photo.rotate(angle, expand=True)
-        self._display_photo(self._out_photo.height, self._out_photo.width)
+        if self._out_photo is not None:
+            self._out_photo = self._out_photo.rotate(angle, expand=True)
+            self._display_photo(self._out_photo.height, self._out_photo.width)
+
 
     def bright(self):
         degree = askfloat(
@@ -119,21 +131,29 @@ class PhotoEditorFunc:
             maxvalue=5.0
         )
 
-        self._out_photo = ImageEnhance.Brightness(self._out_photo).enhance(degree)
-        self._display_photo(self._out_photo.height, self._out_photo.width)
+        if self._out_photo is not None:
+            self._out_photo = ImageEnhance.Brightness(self._out_photo).enhance(degree)
+            self._display_photo(self._out_photo.height, self._out_photo.width)
 
-    def embos(self):
-        self._out_photo = self._out_photo.filter(ImageFilter.EMBOSS)
-        self._display_photo(self._out_photo.height, self._out_photo.width)
+
+    def emboss(self):
+        if self._out_photo is not None:
+            self._out_photo = self._out_photo.filter(ImageFilter.EMBOSS)
+            self._display_photo(self._out_photo.height, self._out_photo.width)
+
 
     def blur(self):
-        self._out_photo = self._out_photo.filter(ImageFilter.BLUR)
-        self._display_photo(self._out_photo.height, self._out_photo.width)
+        if self._out_photo is not None:
+            self._out_photo = self._out_photo.filter(ImageFilter.BLUR)
+            self._display_photo(self._out_photo.height, self._out_photo.width)
+
 
     def sketch(self):
-        self._out_photo = self._out_photo.filter(ImageFilter.CONTOUR)
-        self._display_photo(self._out_photo.height, self._out_photo.width)
+        if self._out_photo is not None:
+            self._out_photo = self._out_photo.filter(ImageFilter.CONTOUR)
+            self._display_photo(self._out_photo.height, self._out_photo.width)
 
     def edge(self):
-        self._out_photo = self._out_photo.filter(ImageFilter.FIND_EDGES)
-        self._display_photo(self._out_photo.height, self._out_photo.width)
+        if self._out_photo is not None:
+            self._out_photo = self._out_photo.filter(ImageFilter.FIND_EDGES)
+            self._display_photo(self._out_photo.height, self._out_photo.width)
