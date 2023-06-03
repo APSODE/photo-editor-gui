@@ -1,4 +1,5 @@
-from typing import Optional, Dict, Callable
+from typing import Optional, Dict, Callable, Union, List
+from src.TestFunc import test
 from tkinter import Tk
 from src.PhotoEditorFunc import PhotoEditorFunc
 import tkinter
@@ -39,7 +40,7 @@ class PhotoEditorGUI:
 
     def _create_menu(self,
                      menu_name: str,
-                     command_data: Dict[str, Optional[Callable]]):
+                     command_data: Dict[str, Union[Optional[Callable], Dict[str, Optional[Callable]]]]):
 
         base_menu_bar = self._component_container.Menu.get("base")
 
@@ -48,13 +49,30 @@ class PhotoEditorGUI:
         )
 
         for menu_label, menu_func in command_data.items():
-            if menu_func is not None:
-                menu_obj.add_command(
-                    label = menu_label,
-                    command = menu_func
+            if isinstance(menu_func, dict):
+                inner_menu_object = tkinter.Menu(
+                    master = menu_obj
                 )
+                for inner_menu_label, inner_menu_func in menu_func.items():
+                    if inner_menu_func is not None:
+                        inner_menu_object.add_command(
+                            label = inner_menu_label,
+                            command = inner_menu_func
+                        )
+                    else:
+                        inner_menu_object.add_separator()
+
+                menu_obj.add_cascade(label = menu_label, menu = inner_menu_object)
+
             else:
-                menu_obj.add_separator()
+                if menu_func is not None:
+                    menu_obj.add_command(
+                        label = menu_label,
+                        command = menu_func
+                    )
+
+                else:
+                    menu_obj.add_separator()
 
         base_menu_bar.add_cascade(
             label = menu_name,
@@ -95,6 +113,18 @@ class PhotoEditorGUI:
                 "상하 반전": self._photo_editor.upsidedown,
                 "좌우 반전": self._photo_editor.leftright,
                 "회전": self._photo_editor.rotate
+            }
+        )
+
+        self._create_menu(
+            menu_name = "테스트 1",
+            command_data = {
+                "테스트 1-1": test,
+                "테스트 1-2": {
+                    "테스트 1-2-1": test,
+                    "테스트 1-2-2": test,
+                    "테스트 1-2-3": test
+                }
             }
         )
 
