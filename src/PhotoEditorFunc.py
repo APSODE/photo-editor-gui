@@ -11,6 +11,11 @@ class PhotoEditorFunc:
         self._master = gui_master
         self._out_photo = None
         self._canvas: Optional[Canvas] = None
+        self._color = "black"
+        self._start_x = 0
+        self._start_y = 0
+        self._end_x = 0
+        self._end_y = 0
 
     def _display_photo(self, height: int, width: int):
         if self._canvas is not None:
@@ -163,5 +168,66 @@ class PhotoEditorFunc:
             self._out_photo = self._out_photo.filter(ImageFilter.FIND_EDGES)
             self._display_photo(self._out_photo.height, self._out_photo.width)
 
-    def drawing(self):
-        pass
+    def cred(self):
+        self._color = "red"
+
+    def cblue(self):
+        self._color = "blue"
+
+    def cyellow(self):
+        self._color = "yellow"
+
+    def cblack(self):
+        self._color = "black"
+
+    def startpoint(self, event):
+        self._start_x = event.x
+        self._start_y = event.y
+
+    def endpoint(self, event):
+        self._end_x = event.x
+        self._end_y = event.y
+
+    def reset(self):
+        self._start_x, self._start_y, self._end_x, self._end_y = 0, 0, 0, 0
+
+    def setting(self):
+        self._master.bind("<Button-1>", self.startpoint)
+        self._master.bind("<ButtonRelease-1>", self.endpoint)
+
+    def oval(self):
+        self.setting()
+        self._canvas.create_oval(
+            self._start_x,
+            self._start_y,
+            self._end_x,
+            self._end_y,
+            outline=self._color
+        )
+
+        self.reset()
+
+    def line(self):
+        self.setting()
+        self._canvas.create_line(
+            self._start_x,
+            self._start_y,
+            self._end_x,
+            self._end_y,
+            width=1,
+            fill=self._color
+        )
+
+        self.reset()
+
+    def rect(self):
+        self.setting()
+        self._canvas.create_rectangle(
+            self._start_x,
+            self._start_y,
+            self._end_x,
+            self._end_y,
+            outline=self._color
+        )
+
+        self.reset()

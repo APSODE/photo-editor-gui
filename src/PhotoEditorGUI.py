@@ -120,15 +120,15 @@ class PhotoEditorGUI:
             menu_name = "도형그리기",
             command_data = {
                 "색": {
-                    "빨간색": test,
-                    "파란색": test,
-                    "노란색": test,
-                    "검은색": test
+                    "빨간색": self._photo_editor.cred,
+                    "파란색": self._photo_editor.cblue,
+                    "노란색": self._photo_editor.cyellow,
+                    "검은색": self._photo_editor.cblack
                 },
                 "도형": {
-                    "원": test,
-                    "직선": test,
-                    "네모": test
+                    "원": self._photo_editor.oval,
+                    "선": self._photo_editor.line,
+                    "네모": self._photo_editor.rect
                 }
             }
         )
