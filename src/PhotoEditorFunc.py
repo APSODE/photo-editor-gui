@@ -2,7 +2,7 @@ from typing import Optional
 from tkinter.filedialog import askopenfilename, asksaveasfile
 from tkinter.simpledialog import askinteger, askfloat
 from tkinter import Tk, Canvas, NW
-from PIL import Image, ImageTk, ImageEnhance, ImageFilter
+from PIL import Image, ImageTk, ImageEnhance, ImageFilter, ImageGrab
 
 
 class PhotoEditorFunc:
@@ -12,10 +12,8 @@ class PhotoEditorFunc:
         self._out_photo = None
         self._canvas: Optional[Canvas] = None
         self._color = "black"
-        self._start_x = 0
-        self._start_y = 0
-        self._end_x = 0
-        self._end_y = 0
+        self.start_x, self.start_y = 0, 0
+        self.end_x , self.end_y = 0, 0
 
     def _display_photo(self, height: int, width: int):
         if self._canvas is not None:
@@ -34,7 +32,6 @@ class PhotoEditorFunc:
         self._master.geometry(f"{width}x{height}")
         self._master.mainloop()
 
-
     def openfile(self):
         file_name = askopenfilename(
             parent=self._master,
@@ -49,7 +46,6 @@ class PhotoEditorFunc:
                 )
             )
         )
-
 
         self._out_photo = Image.open(file_name)
         out_x = self._out_photo.width
@@ -91,9 +87,9 @@ class PhotoEditorFunc:
         )
 
         if self._out_photo is not None:
-            self._out_photo = self._out_photo.resize((self._out_photo.height * zoom_in_scale, self._out_photo.width * zoom_in_scale))
+            self._out_photo = self._out_photo.resize(
+                (self._out_photo.height * zoom_in_scale, self._out_photo.width * zoom_in_scale))
             self._display_photo(self._out_photo.height, self._out_photo.width)
-
 
     def zoomout(self):
         zoom_out_scale = askinteger(
@@ -104,21 +100,19 @@ class PhotoEditorFunc:
         )
 
         if self._out_photo is not None:
-            self._out_photo = self._out_photo.resize((self._out_photo.height / zoom_out_scale, self._out_photo.width / zoom_out_scale))
+            self._out_photo = self._out_photo.resize(
+                (self._out_photo.height / zoom_out_scale, self._out_photo.width / zoom_out_scale))
             self._display_photo(self._out_photo.height, self._out_photo.width)
-
 
     def upsidedown(self):
         if self._out_photo is not None:
             self._out_photo = self._out_photo.transpose(Image.FLIP_TOP_BOTTOM)
             self._display_photo(self._out_photo.height, self._out_photo.width)
 
-
     def leftright(self):
         if self._out_photo is not None:
             self._out_photo = self._out_photo.transpose(Image.FLIP_LEFT_RIGHT)
             self._display_photo(self._out_photo.height, self._out_photo.width)
-
 
     def rotate(self):
         angle = askinteger(
@@ -132,7 +126,6 @@ class PhotoEditorFunc:
             self._out_photo = self._out_photo.rotate(angle, expand=True)
             self._display_photo(self._out_photo.height, self._out_photo.width)
 
-
     def bright(self):
         degree = askfloat(
             "밝게/어둡게",
@@ -145,18 +138,15 @@ class PhotoEditorFunc:
             self._out_photo = ImageEnhance.Brightness(self._out_photo).enhance(degree)
             self._display_photo(self._out_photo.height, self._out_photo.width)
 
-
     def emboss(self):
         if self._out_photo is not None:
             self._out_photo = self._out_photo.filter(ImageFilter.EMBOSS)
             self._display_photo(self._out_photo.height, self._out_photo.width)
 
-
     def blur(self):
         if self._out_photo is not None:
             self._out_photo = self._out_photo.filter(ImageFilter.BLUR)
             self._display_photo(self._out_photo.height, self._out_photo.width)
-
 
     def sketch(self):
         if self._out_photo is not None:
@@ -181,15 +171,15 @@ class PhotoEditorFunc:
         self._color = "black"
 
     def startpoint(self, event):
-        self._start_x = event.x
-        self._start_y = event.y
+        self.start_x = event.x
+        self.start_y = event.y
 
     def endpoint(self, event):
-        self._end_x = event.x
-        self._end_y = event.y
+        self.end_x = event.x
+        self.end_y = event.y
 
     def reset(self):
-        self._start_x, self._start_y, self._end_x, self._end_y = 0, 0, 0, 0
+        self.start_x, self.start_y, self.end_x, self.end_y = 0, 0, 0, 0
 
     def setting(self):
         self._master.bind("<Button-1>", self.startpoint)
@@ -198,10 +188,10 @@ class PhotoEditorFunc:
     def oval(self):
         self.setting()
         self._canvas.create_oval(
-            self._start_x,
-            self._start_y,
-            self._end_x,
-            self._end_y,
+            self.start_x,
+            self.start_y,
+            self.end_x,
+            self.end_y,
             outline=self._color
         )
 
@@ -210,10 +200,10 @@ class PhotoEditorFunc:
     def line(self):
         self.setting()
         self._canvas.create_line(
-            self._start_x,
-            self._start_y,
-            self._end_x,
-            self._end_y,
+            self.start_x,
+            self.start_y,
+            self.end_x,
+            self.end_y,
             width=1,
             fill=self._color
         )
@@ -223,10 +213,10 @@ class PhotoEditorFunc:
     def rect(self):
         self.setting()
         self._canvas.create_rectangle(
-            self._start_x,
-            self._start_y,
-            self._end_x,
-            self._end_y,
+            self.start_x,
+            self.start_y,
+            self.end_x,
+            self.end_y,
             outline=self._color
         )
 
