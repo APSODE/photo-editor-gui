@@ -1,144 +1,228 @@
-from typing import Optional, Dict, Callable, Union
-from tkinter import Tk
-from PhotoEditorFunc import PhotoEditorFunc
-import tkinter
+from typing import Optional
+from tkinter.filedialog import askopenfilename, asksaveasfile
+from tkinter.simpledialog import askinteger, askfloat
+from tkinter import Tk, Canvas, NW
+from PIL import Image, ImageTk, ImageEnhance, ImageFilter, ImageGrab
 
 
-class ComponentContainer:
-    def __init__(self):
-        self._menu = {}
+class PhotoEditorFunc:
 
-    @property
-    def Menu(self) -> Dict[str, tkinter.Menu]:
-        return self._menu
+    def __init__(self, gui_master: Tk):
+        self._master = gui_master
+        self._out_photo: Image = None
+        self._canvas: Optional[Canvas] = None
+        self._color = "black"
+        self.start_x, self.start_y = 0, 0
+        self.end_x , self.end_y = 0, 0
 
-    @Menu.setter
-    def Menu(self, new_menu: Dict[str, tkinter.Menu]):
-        self._menu = new_menu
+    def _display_photo(self, height: int, width: int):
+        if self._canvas is not None:
+            self._canvas.destroy()
 
-
-class PhotoEditorGUI:
-    def __init__(self):
-        self._master = Tk()
-        self._photo_editor = PhotoEditorFunc(self._master)
-        self._component_container = ComponentContainer()
-        self._set_default_window_setting()
-        self._set_base_component()
-        self._set_menu_component()
-
-    def _set_default_window_setting(self):
-        self._master.title("포토 에디터")
-        self._master.geometry("500x500")
-        self._master.resizable = (True, True)
-
-    def _set_base_component(self):
-        base_menu = tkinter.Menu(
-            master = self._master
-        )
-        self._component_container.Menu["base"] = base_menu
-
-    def _create_menu(self,
-                     menu_name: str,
-                     command_data: Dict[str, Union[Optional[Callable], Dict[str, Optional[Callable]]]]):
-
-        base_menu_bar = self._component_container.Menu.get("base")
-
-        menu_obj = tkinter.Menu(
-            master = base_menu_bar
+        self._canvas = Canvas(
+            master=self._master,
+            width=width,
+            height=height
         )
 
-        for menu_label, menu_func in command_data.items():
-            if isinstance(menu_func, dict):
-                inner_menu_object = tkinter.Menu(
-                    master = menu_obj
-                )
-                for inner_menu_label, inner_menu_func in menu_func.items():
-                    if inner_menu_func is not None:
-                        inner_menu_object.add_command(
-                            label = inner_menu_label,
-                            command = inner_menu_func
-                        )
-                    else:
-                        inner_menu_object.add_separator()
+        ChangeImage = ImageTk.PhotoImage(self._out_photo)
 
-                menu_obj.add_cascade(label = menu_label, menu = inner_menu_object)
-
-            else:
-                if menu_func is not None:
-                    menu_obj.add_command(
-                        label = menu_label,
-                        command = menu_func
-                    )
-
-                else:
-                    menu_obj.add_separator()
-
-        base_menu_bar.add_cascade(
-            label = menu_name,
-            menu = menu_obj
-        )
-        self._master.config(menu = base_menu_bar)
-
-    def _set_menu_component(self):
-        self._create_menu(
-            menu_name = "파일",
-            command_data = {
-                "파일 열기": self._photo_editor.openfile,
-                "파일 저장": self._photo_editor.saveimagefile,
-                "sp1": None,
-                "프로그램 종료": self._photo_editor.funcexit
-            }
-        )
-
-        self._create_menu(
-            menu_name = "이미지 처리 (1)",
-            command_data = {
-                "밝게/어둡게": self._photo_editor.bright,
-                "sp1": None,
-                "엠보싱": self._photo_editor.emboss,
-                "블러링": self._photo_editor.blur,
-                "sp2": None,
-                "연필스케치": self._photo_editor.sketch,
-                "경계선 추출": self._photo_editor.edge
-            }
-        )
-
-        self._create_menu(
-            menu_name = "이미지 처리 (2)",
-            command_data = {
-                "확대": self._photo_editor.zoomin,
-                "축소": self._photo_editor.zoomout,
-                "sp1": None,
-                "상하 반전": self._photo_editor.upsidedown,
-                "좌우 반전": self._photo_editor.leftright,
-                "회전": self._photo_editor.rotate,
-            }
-        )
-
-        self._create_menu(
-            menu_name = "도형그리기",
-            command_data = {
-                "색": {
-                    "빨간색": self._photo_editor.cred,
-                    "파란색": self._photo_editor.cblue,
-                    "노란색": self._photo_editor.cyellow,
-                    "검은색": self._photo_editor.cblack
-                },
-                "도형": {
-                    "원": self._photo_editor.oval,
-                    "선": self._photo_editor.line,
-                    "네모": self._photo_editor.rect
-                }
-            }
-        )
-
-    def ShowGUI(self):
+        self._canvas.create_image(0, 0, anchor=NW, image=ChangeImage)
+        self._canvas.pack()
+        self._master.geometry(f"{width}x{height}")
         self._master.mainloop()
 
+    def openfile(self):
+        file_name = askopenfilename(
+            parent=self._master,
+            filetypes=(
+                (
+                    "모든 그림 파일",
+                    "*.jpg; *.jpeg; *.bmp; *.png; *.tif"
+                ),
+                (
+                    "모든 파일",
+                    " *.* "
+                )
+            )
+        )
 
-if __name__ == '__main__':
-    PEGUI = PhotoEditorGUI()
-    PEGUI.ShowGUI()
+        self._out_photo = Image.open(file_name)
+        out_x = self._out_photo.width
+        out_y = self._out_photo.height
+        self._display_photo(out_y, out_x)
+
+    def funcexit(self):
+        exit()
+
+    def saveimagefile(self):
+        save_photo = ImageGrab.grab(bbox=(
+            self._master.winfo_rootx()+5,
+            self._master.winfo_rooty()+5,
+            self._master.winfo_rootx() + self._master.winfo_width(),
+            self._master.winfo_rooty() + self._master.winfo_height()
+        ))
 
 
+        if self._out_photo is None:
+            return
 
+        save_file = asksaveasfile(
+            parent=self._master,
+            mode="w",
+            defaultextension=".jpg",
+            filetypes=(
+                (
+                    "JPG파일",
+                    "*.jpg; *jpeg"
+                ),
+                (
+                    "모든 파일",
+                    "*.*"
+                )
+            )
+        )
+        save_photo.save(save_file.name)
+
+    def zoomin(self):
+        zoom_in_scale = askinteger(
+            "확대배수",
+            "확대할 배수를 입력하세요",
+            minvalue=2,
+            maxvalue=8
+        )
+
+        if self._out_photo is not None:
+            self._out_photo = self._out_photo.resize(
+                (self._out_photo.height * zoom_in_scale, self._out_photo.width * zoom_in_scale))
+            self._display_photo(self._out_photo.height, self._out_photo.width)
+
+    def zoomout(self):
+        zoom_out_scale = askinteger(
+            "확대배수",
+            "확대할 배수를 입력하세요",
+            minvalue=2,
+            maxvalue=8
+        )
+
+        if self._out_photo is not None:
+            self._out_photo = self._out_photo.resize(
+                (self._out_photo.height / zoom_out_scale, self._out_photo.width / zoom_out_scale))
+            self._display_photo(self._out_photo.height, self._out_photo.width)
+
+    def upsidedown(self):
+        if self._out_photo is not None:
+            self._out_photo = self._out_photo.transpose(Image.FLIP_TOP_BOTTOM)
+            self._display_photo(self._out_photo.height, self._out_photo.width)
+
+    def leftright(self):
+        if self._out_photo is not None:
+            self._out_photo = self._out_photo.transpose(Image.FLIP_LEFT_RIGHT)
+            self._display_photo(self._out_photo.height, self._out_photo.width)
+
+    def rotate(self):
+        angle = askinteger(
+            "회전",
+            "회전할 각도를 입력하세요",
+            minvalue=0,
+            maxvalue=360
+        )
+
+        if self._out_photo is not None:
+            self._out_photo = self._out_photo.rotate(angle, expand=True)
+            self._display_photo(self._out_photo.height, self._out_photo.width)
+
+    def bright(self):
+        degree = askfloat(
+            "밝게/어둡게",
+            "값을 입력하세요(0.0 ~ 5.0)",
+            minvalue=0.0,
+            maxvalue=5.0
+        )
+
+        if self._out_photo is not None:
+            self._out_photo = ImageEnhance.Brightness(self._out_photo).enhance(degree)
+            self._display_photo(self._out_photo.height, self._out_photo.width)
+
+    def emboss(self):
+        if self._out_photo is not None:
+            self._out_photo = self._out_photo.filter(ImageFilter.EMBOSS)
+            self._display_photo(self._out_photo.height, self._out_photo.width)
+
+    def blur(self):
+        if self._out_photo is not None:
+            self._out_photo = self._out_photo.filter(ImageFilter.BLUR)
+            self._display_photo(self._out_photo.height, self._out_photo.width)
+
+    def sketch(self):
+        if self._out_photo is not None:
+            self._out_photo = self._out_photo.filter(ImageFilter.CONTOUR)
+            self._display_photo(self._out_photo.height, self._out_photo.width)
+
+    def edge(self):
+        if self._out_photo is not None:
+            self._out_photo = self._out_photo.filter(ImageFilter.FIND_EDGES)
+            self._display_photo(self._out_photo.height, self._out_photo.width)
+
+    def cred(self):
+        self._color = "red"
+
+    def cblue(self):
+        self._color = "blue"
+
+    def cyellow(self):
+        self._color = "yellow"
+
+    def cblack(self):
+        self._color = "black"
+
+    def startpoint(self, event):
+        self.start_x = event.x
+        self.start_y = event.y
+
+    def endpoint(self, event):
+        self.end_x = event.x
+        self.end_y = event.y
+
+    def reset(self):
+        self.start_x, self.start_y, self.end_x, self.end_y = 0, 0, 0, 0
+
+    def setting(self):
+        self._master.bind("<Button-1>", self.startpoint)
+        self._master.bind("<ButtonRelease-1>", self.endpoint)
+
+    def oval(self):
+        self.setting()
+        self._canvas.create_oval(
+            self.start_x,
+            self.start_y,
+            self.end_x,
+            self.end_y,
+            outline=self._color
+        )
+
+        self.reset()
+    def line(self):
+        self.setting()
+        self._canvas.create_line(
+            self.start_x,
+            self.start_y,
+            self.end_x,
+            self.end_y,
+            width=1,
+            fill=self._color
+        )
+
+        self.reset()
+
+    def rect(self):
+        self.setting()
+        self._canvas.create_rectangle(
+            self.start_x,
+            self.start_y,
+            self.end_x,
+            self.end_y,
+            outline=self._color
+        )
+
+        self.reset()
